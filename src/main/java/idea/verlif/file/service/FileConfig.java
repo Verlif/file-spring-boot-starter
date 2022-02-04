@@ -1,6 +1,8 @@
 package idea.verlif.file.service;
 
 import idea.verlif.file.service.impl.DefaultFileService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +18,8 @@ import java.io.File;
 @Configuration
 @ConfigurationProperties(prefix = "station.file")
 public class FileConfig {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileConfig.class);
 
     /**
      * 文件路径分隔符
@@ -67,6 +71,7 @@ public class FileConfig {
             } else {
                 this.main = main;
             }
+            LOGGER.info("File service's main path is based on " + this.main);
         }
 
         public String getMain() {

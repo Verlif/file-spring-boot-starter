@@ -17,17 +17,17 @@ public class FileQuery {
     /**
      * 每页大小
      */
-    protected Integer pageSize = 15;
+    protected Integer page = 15;
 
     /**
      * 页码，从1开始
      */
-    protected Integer pageNum = 1;
+    protected Integer num = 1;
 
     /**
      * 排序字段
      */
-    protected String orderBy;
+    protected String order;
 
     /**
      * 是否升序
@@ -42,46 +42,32 @@ public class FileQuery {
         this.name = name;
     }
 
-    public Integer getPageSize() {
-        return pageSize;
+    public Integer getPage() {
+        return page;
     }
 
-    public void setPageSize(Integer pageSize) {
-        this.pageSize = pageSize;
+    public void setPage(Integer page) {
+        if (page > 0) {
+            this.page = page;
+        }
     }
 
-    public Integer getPageNum() {
-        return pageNum;
-    }
-
-    public String getOrderBy() {
-        return orderBy;
-    }
-
-    public void setOrderBy(String orderBy) {
-        this.orderBy = orderBy;
-    }
-
-    public boolean isAsc() {
-        return asc;
-    }
-
-    public void setAsc(boolean asc) {
-        this.asc = asc;
+    public Integer getNum() {
+        return num;
     }
 
     /**
      * 获取页头序号
      */
     public Integer getPageHead() {
-        return (pageNum - 1) * pageSize;
+        return (num - 1) * page;
     }
 
-    public void setPageNum(Integer pageNum) {
-        if (pageNum < 1) {
-            this.pageNum = 1;
+    public void setNum(Integer num) {
+        if (num < 1) {
+            this.num = 1;
         } else {
-            this.pageNum = pageNum;
+            this.num = num;
         }
     }
 
