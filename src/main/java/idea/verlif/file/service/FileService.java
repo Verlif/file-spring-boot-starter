@@ -58,6 +58,17 @@ public interface FileService {
     int uploadFile(FileCart fileCart, String type, MultipartFile... files) throws IOException;
 
     /**
+     * 上传文件
+     *
+     * @param fileCart 文件域
+     * @param type     文件子路径；可为空
+     * @param file     目标文件组
+     * @param filename 储存的文件名
+     * @return 上传成功的文件数量
+     */
+    boolean uploadFile(FileCart fileCart, String type, MultipartFile file, String filename) throws IOException;
+
+    /**
      * 下载文件
      *
      * @param response 服务器响应对象

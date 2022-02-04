@@ -167,6 +167,23 @@ public class DefaultFileService implements FileService {
         return count;
     }
 
+    @Override
+    public boolean uploadFile(FileCart fileCart, String type, MultipartFile file, String filename) throws IOException {
+        if (file == null) {
+            return false;
+        }
+        File dirFile = getLocalFile(fileCart, type);
+        // 创建目标文件域
+        if (!dirFile.exists()) {
+            if (!dirFile.mkdirs()) {
+                return false;
+            }
+        }
+        File dir = new File(dirFile, filename);
+        file.transferTo(dir);
+        return true;
+    }
+
     /**
      * 下载文件
      *
