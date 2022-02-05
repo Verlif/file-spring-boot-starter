@@ -112,8 +112,9 @@ public class DefaultFileService implements FileService {
             switch (query.getOrder()) {
                 case NAME:
                     filterList = stream.sorted((o1, o2) -> query.isAsc() ?
-                            o1.getFileName().charAt(0) - o2.getFileName().charAt(0) :
-                            o2.getFileName().charAt(0) - o1.getFileName().charAt(0)).collect(Collectors.toList());
+                                    o1.getFileName().compareTo(o2.getFileName()) :
+                                    o2.getFileName().compareTo(o1.getFileName()))
+                            .collect(Collectors.toList());
                     break;
                 case SIZE:
                     filterList = stream.sorted((o1, o2) -> (int) (query.isAsc() ?
@@ -122,10 +123,17 @@ public class DefaultFileService implements FileService {
                             .collect(Collectors.toList());
                     break;
                 case SUFFIX:
-                    filterList = stream.sorted((o1, o2) -> query.isAsc() ?
-                                    o1.getSuffix().charAt(0) - o2.getSuffix().charAt(0) :
-                                    o2.getSuffix().charAt(0) - o1.getSuffix().charAt(0))
-                            .collect(Collectors.toList());
+                    filterList = stream.sorted((o1, o2) -> {
+                        if (o1.getSuffix() == null) {
+                            return -1;
+                        }
+                        if (o2.getSuffix() == null) {
+                            return 1;
+                        }
+                        return query.isAsc() ?
+                                o1.getSuffix().compareTo(o2.getSuffix()) :
+                                o2.getSuffix().compareTo(o1.getSuffix());
+                    }).collect(Collectors.toList());
                     break;
                 case UPDATE_TIME:
                     filterList = stream.sorted((o1, o2) -> (int) (query.isAsc() ?

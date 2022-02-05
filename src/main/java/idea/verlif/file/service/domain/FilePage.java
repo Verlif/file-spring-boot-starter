@@ -1,5 +1,6 @@
 package idea.verlif.file.service.domain;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -55,4 +56,14 @@ public class FilePage {
         this.pages = pages;
     }
 
+    @Override
+    public String toString() {
+        return "FilePage{" +
+                "infos=" + Arrays.toString(infos.toArray()) +
+                ", total=" + total +
+                ", size=" + size +
+                ", current=" + current +
+                ", pages=" + pages +
+                '}';
+    }
 }

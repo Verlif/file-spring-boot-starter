@@ -62,4 +62,14 @@ public class FileInfo {
     public void setSuffix(String suffix) {
         this.suffix = suffix;
     }
+
+    @Override
+    public String toString() {
+        return "FileInfo{" +
+                "fileName='" + fileName + '\'' +
+                ", updateTime=" + updateTime +
+                ", size=" + size +
+                ", suffix='" + suffix + '\'' +
+                '}';
+    }
 }
