@@ -165,7 +165,7 @@ public class DefaultFileService implements FileService {
 
         int suf = name.lastIndexOf(".");
         if (suf != -1) {
-            info.setSuffix(name.substring(suf));
+            info.setSuffix(name.substring(suf + 1));
         }
         return info;
     }
