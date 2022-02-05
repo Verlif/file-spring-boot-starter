@@ -157,17 +157,7 @@ public class DefaultFileService implements FileService {
      * @return 文件对应的Info对象
      */
     protected FileInfo buildInfo(File file) {
-        FileInfo info = new FileInfo();
-        String name = file.getName();
-        info.setFileName(name);
-        info.setUpdateTime(new Date(file.lastModified()));
-        info.setSize(file.length());
-
-        int suf = name.lastIndexOf(".");
-        if (suf != -1) {
-            info.setSuffix(name.substring(suf + 1));
-        }
-        return info;
+        return new FileInfo(file);
     }
 
     protected FilePage page(List<FileInfo> list, FileQuery query) {

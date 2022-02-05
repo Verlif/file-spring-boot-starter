@@ -1,5 +1,6 @@
 package idea.verlif.file.service.domain;
 
+import java.io.File;
 import java.util.Date;
 
 /**
@@ -30,6 +31,20 @@ public class FileInfo {
      * 后缀
      */
     private String suffix;
+
+    public FileInfo() {}
+
+    public FileInfo(File file) {
+        String name = file.getName();
+        this.fileName = name;
+        this.updateTime = new Date(file.lastModified());
+        this.size = file.length();
+
+        int suf = name.lastIndexOf(".");
+        if (suf != -1) {
+            this.suffix = name.substring(suf + 1);
+        }
+    }
 
     public String getFileName() {
         return fileName;
