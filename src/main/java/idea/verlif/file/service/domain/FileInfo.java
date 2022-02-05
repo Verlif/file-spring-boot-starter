@@ -25,7 +25,7 @@ public class FileInfo {
     /**
      * 文件大小
      */
-    private Long size;
+    private Long size = 0L;
 
     /**
      * 后缀
@@ -67,7 +67,9 @@ public class FileInfo {
     }
 
     public void setSize(Long size) {
-        this.size = size;
+        if (size != null && size > 0) {
+            this.size = size;
+        }
     }
 
     public String getSuffix() {

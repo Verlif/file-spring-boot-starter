@@ -25,6 +25,7 @@ public class FileServiceImpl extends DefaultFileService {
     @Override
     protected FileInfo buildInfo(File file) {
         FileInfo info = super.buildInfo(file);
+        // FileData为业务数据，继承了FileInfo
         return new FileData(info);
     }
 }
@@ -34,10 +35,6 @@ public class FileServiceImpl extends DefaultFileService {
 可以通过自动注入来使用`FileConfig`配置
 
 ## 引入依赖
-
-__!当前无法添加依赖__
-__!当前无法添加依赖__
-__!当前无法添加依赖__
 
 1. 添加Jitpack仓库源
 
@@ -59,7 +56,7 @@ __!当前无法添加依赖__
 >        <dependency>
 >            <groupId>com.github.Verlif</groupId>
 >            <artifactId>file-spring-boot-starter</artifactId>
->            <version>2.6.3-beta0.1</version>
+>            <version>2.6.3-alpha0.1</version>
 >        </dependency>
 >    </dependencies>
 > ```

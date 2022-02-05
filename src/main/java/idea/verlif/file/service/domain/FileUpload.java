@@ -10,57 +10,29 @@ package idea.verlif.file.service.domain;
 public class FileUpload {
 
     /**
-     * 文件子路径
+     * 原文件名
      */
-    private String type;
+    private String filename;
 
     /**
-     * Base64文件集合
+     * Base64内容
      */
-    private Base64File[] uploads;
+    private String file;
 
-    public String getType() {
-        return type;
+    public String getFilename() {
+        return filename;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
-    public Base64File[] getUploads() {
-        return uploads;
+    public String getFile() {
+        return file;
     }
 
-    public void setUploads(Base64File[] uploads) {
-        this.uploads = uploads;
+    public void setFile(String file) {
+        this.file = file;
     }
 
-    public static final class Base64File {
-
-        /**
-         * 文件名
-         */
-        private String fileName;
-
-        /**
-         * Base64内容
-         */
-        private String file;
-
-        public String getFileName() {
-            return fileName;
-        }
-
-        public void setFileName(String fileName) {
-            this.fileName = fileName;
-        }
-
-        public String getFile() {
-            return file;
-        }
-
-        public void setFile(String file) {
-            this.file = file;
-        }
-    }
 }

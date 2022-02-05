@@ -2,10 +2,8 @@ package idea.verlif.file.service.impl;
 
 import idea.verlif.file.service.FileConfig;
 import idea.verlif.file.service.FileService;
-import idea.verlif.file.service.domain.FileCart;
-import idea.verlif.file.service.domain.FileInfo;
-import idea.verlif.file.service.domain.FilePage;
-import idea.verlif.file.service.domain.FileQuery;
+import idea.verlif.file.service.domain.*;
+import idea.verlif.file.service.util.File64Util;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -14,7 +12,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -193,10 +190,15 @@ public class DefaultFileService implements FileService {
         int count = 0;
         for (MultipartFile file : files) {
             String name = file.getOriginalFilename();
+            // 没有文件时跳过
             if (name == null) {
                 continue;
             }
             File dir = new File(dirFile, name);
+            // 当不允许覆盖且文件已存在时跳过
+            if (dir.exists() && !pathConfig.isCover()) {
+                continue;
+            }
             file.transferTo(dir);
             count++;
         }
@@ -216,7 +218,32 @@ public class DefaultFileService implements FileService {
             }
         }
         File dir = new File(dirFile, filename);
+        // 当不允许覆盖且文件已存在时不保存
+        if (dir.exists() && !pathConfig.isCover()) {
+            return false;
+        }
         file.transferTo(dir);
+        return true;
+    }
+
+    @Override
+    public boolean uploadFile(FileCart fileCart, String type, FileUpload upload, String filename) throws IOException {
+        if (upload.getFile() == null) {
+            return false;
+        }
+        File dirFile = getLocalFile(fileCart, type);
+        // 创建目标文件域
+        if (!dirFile.exists()) {
+            if (!dirFile.mkdirs()) {
+                return false;
+            }
+        }
+        File target = new File(dirFile, filename);
+        // 当不允许覆盖且文件已存在时不保存
+        if (target.exists() && !pathConfig.isCover()) {
+            return false;
+        }
+        File64Util.toFile(upload.getFile(), target);
         return true;
     }
 
@@ -226,14 +253,14 @@ public class DefaultFileService implements FileService {
      * @param response 服务器响应对象
      * @param fileCart 目标文件所在文件域
      * @param type     文件子目录；可为空
-     * @param fileName 目标文件名
+     * @param filename 目标文件名
      * @return 下载结果
      */
     @Override
-    public boolean downloadFile(HttpServletResponse response, FileCart fileCart, String type, String fileName) throws IOException {
+    public boolean downloadFile(HttpServletResponse response, FileCart fileCart, String type, String filename) throws IOException {
         response.setCharacterEncoding("UTF-8");
-        response.setHeader("content-disposition", "attachment; fileName=" + fileName);
-        File file = new File(getLocalFile(fileCart, type), fileName);
+        response.setHeader("content-disposition", "attachment; fileName=" + filename);
+        File file = new File(getLocalFile(fileCart, type), filename);
         if (file.exists()) {
             try (
                     FileInputStream fis = new FileInputStream(file);
@@ -249,6 +276,21 @@ public class DefaultFileService implements FileService {
             }
         } else {
             return false;
+        }
+    }
+
+    @Override
+    public String buildFile64(FileCart fileCart, String type, String filename) throws IOException {
+        File dirFile = getLocalFile(fileCart, type);
+        // 创建目标文件域
+        if (!dirFile.exists()) {
+            return null;
+        }
+        File target = new File(dirFile, filename);
+        if (target.exists()) {
+            return File64Util.toBase64(target);
+        } else {
+            return null;
         }
     }
 

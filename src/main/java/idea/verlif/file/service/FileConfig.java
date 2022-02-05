@@ -27,6 +27,11 @@ public class FileConfig {
     public static final String DIR_SPLIT = File.separator;
 
     /**
+     * 是否允许覆盖同名文件
+     */
+    private boolean cover;
+
+    /**
      * 路径配置
      */
     private Path path;
@@ -48,6 +53,14 @@ public class FileConfig {
     @ConditionalOnMissingBean(FileService.class)
     public FileService fileService() {
         return new DefaultFileService(this);
+    }
+
+    public boolean isCover() {
+        return cover;
+    }
+
+    public void setCover(boolean cover) {
+        this.cover = cover;
     }
 
     public void setPath(Path path) {

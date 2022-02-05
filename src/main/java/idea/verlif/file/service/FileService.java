@@ -3,6 +3,7 @@ package idea.verlif.file.service;
 import idea.verlif.file.service.domain.FileCart;
 import idea.verlif.file.service.domain.FilePage;
 import idea.verlif.file.service.domain.FileQuery;
+import idea.verlif.file.service.domain.FileUpload;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -69,15 +70,35 @@ public interface FileService {
     boolean uploadFile(FileCart fileCart, String type, MultipartFile file, String filename) throws IOException;
 
     /**
+     * 上传文件
+     *
+     * @param fileCart 文件域
+     * @param type     文件子路径；可为空
+     * @param upload   Base64信息
+     * @return 上传成功的文件数量
+     */
+    boolean uploadFile(FileCart fileCart, String type, FileUpload upload, String filename) throws IOException;
+
+    /**
      * 下载文件
      *
      * @param response 服务器响应对象
      * @param fileCart 目标文件所在文件域
      * @param type     文件子目录；可为空
-     * @param fileName 目标文件名
+     * @param filename 目标文件名
      * @return 是否下载成功
      */
-    boolean downloadFile(HttpServletResponse response, FileCart fileCart, String type, String fileName) throws IOException;
+    boolean downloadFile(HttpServletResponse response, FileCart fileCart, String type, String filename) throws IOException;
+
+    /**
+     * 获取文件的Base64格式数据
+     *
+     * @param fileCart 目标文件所在文件域
+     * @param type     文件子目录；可为空
+     * @param filename 目标文件名
+     * @return Base64数据。当文件无效或无法获取信息时，返回值为{@code null}
+     */
+    String buildFile64(FileCart fileCart, String type, String filename) throws IOException;
 
     /**
      * 删除文件
