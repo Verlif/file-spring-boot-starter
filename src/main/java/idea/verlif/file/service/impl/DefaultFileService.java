@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Verlif
@@ -105,6 +106,36 @@ public class DefaultFileService implements FileService {
                     .sorted((o1, o2) -> (int) (o2.getUpdateTime().getTime() - o1.getUpdateTime().getTime()))
                     .collect(Collectors.toList());
         }
+        // 排序操作
+        if (query.getOrder() != null) {
+            Stream<FileInfo> stream = filterList.stream();
+            switch (query.getOrder()) {
+                case NAME:
+                    filterList = stream.sorted((o1, o2) -> query.isAsc() ?
+                            o1.getFileName().charAt(0) - o2.getFileName().charAt(0) :
+                            o2.getFileName().charAt(0) - o1.getFileName().charAt(0)).collect(Collectors.toList());
+                    break;
+                case SIZE:
+                    filterList = stream.sorted((o1, o2) -> (int) (query.isAsc() ?
+                                    o1.getSize() - o2.getSize() :
+                                    o2.getSize() - o1.getSize()))
+                            .collect(Collectors.toList());
+                    break;
+                case SUFFIX:
+                    filterList = stream.sorted((o1, o2) -> query.isAsc() ?
+                                    o1.getSuffix().charAt(0) - o2.getSuffix().charAt(0) :
+                                    o2.getSuffix().charAt(0) - o1.getSuffix().charAt(0))
+                            .collect(Collectors.toList());
+                    break;
+                case UPDATE_TIME:
+                    filterList = stream.sorted((o1, o2) -> (int) (query.isAsc() ?
+                                    o1.getUpdateTime().getTime() - o2.getUpdateTime().getTime() :
+                                    o2.getUpdateTime().getTime() - o1.getUpdateTime().getTime()))
+                            .collect(Collectors.toList());
+                    break;
+                default:
+            }
+        }
         list.clear();
         list.addAll(filterList);
         // 创建分页对象
@@ -119,12 +150,19 @@ public class DefaultFileService implements FileService {
      */
     protected FileInfo buildInfo(File file) {
         FileInfo info = new FileInfo();
-        info.setFileName(file.getName());
+        String name = file.getName();
+        info.setFileName(name);
         info.setUpdateTime(new Date(file.lastModified()));
+        info.setSize(file.length());
+
+        int suf = name.lastIndexOf(".");
+        if (suf != -1) {
+            info.setSuffix(name.substring(suf));
+        }
         return info;
     }
 
-    private FilePage page(List<FileInfo> list, FileQuery query) {
+    protected FilePage page(List<FileInfo> list, FileQuery query) {
         FilePage page = new FilePage();
         page.setTotal(list.size());
         page.setSize(query.getPage());

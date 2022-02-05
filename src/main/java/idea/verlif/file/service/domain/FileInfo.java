@@ -21,6 +21,16 @@ public class FileInfo {
      */
     private Date updateTime;
 
+    /**
+     * 文件大小
+     */
+    private Long size;
+
+    /**
+     * 后缀
+     */
+    private String suffix;
+
     public String getFileName() {
         return fileName;
     }
@@ -37,4 +47,19 @@ public class FileInfo {
         this.updateTime = updateTime;
     }
 
+    public Long getSize() {
+        return size;
+    }
+
+    public void setSize(Long size) {
+        this.size = size;
+    }
+
+    public String getSuffix() {
+        return suffix;
+    }
+
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
+    }
 }

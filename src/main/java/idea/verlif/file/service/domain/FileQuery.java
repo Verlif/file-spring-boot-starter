@@ -27,7 +27,7 @@ public class FileQuery {
     /**
      * 排序字段
      */
-    protected String order;
+    protected Order order;
 
     /**
      * 是否升序
@@ -71,4 +71,41 @@ public class FileQuery {
         }
     }
 
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
+    public boolean isAsc() {
+        return asc;
+    }
+
+    public void setAsc(boolean asc) {
+        this.asc = asc;
+    }
+
+    public enum Order {
+        /**
+         * 通过文件名排序
+         */
+        NAME,
+
+        /**
+         * 文件更新时间
+         */
+        UPDATE_TIME,
+
+        /**
+         * 文件大小
+         */
+        SIZE,
+
+        /**
+         * 文件后缀
+         */
+        SUFFIX
+    }
 }
