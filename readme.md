@@ -1,7 +1,11 @@
 # FileService
 
 简单的文件管理系统  
-通过FileService来使用文件上传、下载、查询、删除等功能
+通过`FileService`来使用以下功能：
+* 文件上传（字节流与Base64）
+* 文件下载（字节流与Base64）
+* 文件查询（分页、排序、文件名过滤等）
+* 文件删除
 
 ## 使用
 
@@ -31,8 +35,50 @@ public class FileServiceImpl extends DefaultFileService {
 }
 ```
 
-注意，因为`DefaultFileService`实现了`FileService`接口，所以实际上，开发者需要实现的是`FileService`接口。  
+注意，因为`DefaultFileService`实现了`FileService`接口，所以实际上，开发者需要实现的是`FileService`接口。推荐通过继承重写的方式来实现需要的功能。  
 可以通过自动注入来使用`FileConfig`配置
+
+3. 使用`FileService`
+
+在上传、下载文件时，可以使用`FileService`来完成。
+
+```java
+@RestController
+@RequestMapping("/file")
+@Api(tags = "文件管理")
+public class FileController {
+
+    @Autowired
+    private FileService fileService;
+
+    @PostMapping
+    @Operation(summary = "上传文件")
+    public int uploadFile(MultipartFile[] files) {
+        return fileService.uploadFile(new FileCart("test"), SecurityUtils.getUsername(), files);
+    }
+
+    @GetMapping
+    @Operation(summary = "下载文件")
+    public boolean downloadFile(
+            @RequestParam String fileName,
+            HttpServletResponse response
+    ) {
+        return fileService.downloadFile(response, new FileCart("test"), SecurityUtils.getUsername(), fileName);
+    }
+
+    @GetMapping("/list")
+    @Operation(summary = "文件列表")
+    public FilePage getFileList(FileQuery fileQuery) {
+        return fileService.getFileList(new FileCart("test"), SecurityUtils.getUsername(), fileQuery);
+    }
+
+    @DeleteMapping
+    @Operation(summary = "删除文件")
+    public boolean deleteFile(@RequestParam String filename) {
+        return fileService.deleteFile(new FileCart("test"), SecurityUtils.getUsername(), filename);
+    }
+}
+```
 
 ## 引入依赖
 
@@ -56,7 +102,26 @@ public class FileServiceImpl extends DefaultFileService {
 >        <dependency>
 >            <groupId>com.github.Verlif</groupId>
 >            <artifactId>file-spring-boot-starter</artifactId>
->            <version>2.6.3-alpha0.1</version>
+>            <version>2.6.3-0.1</version>
 >        </dependency>
 >    </dependencies>
 > ```
+
+## 配置文件
+
+可以在`application.yml`中配置`FileService`的一些参数：
+
+```yaml
+station:
+  file:
+    # 是否允许新上传的文件覆盖已有的同名文件
+    cover: false
+    path:
+      # 文件系统根目录，相对路径或绝对路径
+      main: F:/upload
+```
+
+## 说明
+
+* `FileCart`表示了文件域，也就是文件夹。**不**允许为空。
+* `type`表示了文件域下的子文件夹。与`FileCart`分开的目的是为了做类型区分。允许为空。

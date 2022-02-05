@@ -282,7 +282,7 @@ public class DefaultFileService implements FileService {
     @Override
     public String buildFile64(FileCart fileCart, String type, String filename) throws IOException {
         File dirFile = getLocalFile(fileCart, type);
-        // 创建目标文件域
+        // 判定文件域是否存在
         if (!dirFile.exists()) {
             return null;
         }
