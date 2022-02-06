@@ -55,6 +55,13 @@ public class FileConfig {
         return new DefaultFileService(this);
     }
 
+    /**
+     * 是否忽略已存在同名文件
+     */
+    public boolean isIgnored() {
+        return !cover;
+    }
+
     public boolean isCover() {
         return cover;
     }

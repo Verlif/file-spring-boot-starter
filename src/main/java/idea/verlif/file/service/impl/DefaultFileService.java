@@ -196,7 +196,7 @@ public class DefaultFileService implements FileService {
             }
             File dir = new File(dirFile, name);
             // 当不允许覆盖且文件已存在时跳过
-            if (dir.exists() && !pathConfig.isCover()) {
+            if (dir.exists() && pathConfig.isIgnored()) {
                 continue;
             }
             file.transferTo(dir);
@@ -219,7 +219,7 @@ public class DefaultFileService implements FileService {
         }
         File dir = new File(dirFile, filename);
         // 当不允许覆盖且文件已存在时不保存
-        if (dir.exists() && !pathConfig.isCover()) {
+        if (dir.exists() && pathConfig.isIgnored()) {
             return false;
         }
         file.transferTo(dir);
@@ -240,7 +240,7 @@ public class DefaultFileService implements FileService {
         }
         File target = new File(dirFile, filename);
         // 当不允许覆盖且文件已存在时不保存
-        if (target.exists() && !pathConfig.isCover()) {
+        if (target.exists() && pathConfig.isIgnored()) {
             return false;
         }
         File64Util.toFile(upload.getFile(), target);

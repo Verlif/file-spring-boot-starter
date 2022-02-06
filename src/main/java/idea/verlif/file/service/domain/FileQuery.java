@@ -1,5 +1,7 @@
 package idea.verlif.file.service.domain;
 
+import java.util.Locale;
+
 /**
  * 文件查询条件
  *
@@ -77,6 +79,12 @@ public class FileQuery {
 
     public void setOrder(Order order) {
         this.order = order;
+    }
+
+    public void setOrder(String order) {
+        try {
+            this.order = Order.valueOf(order.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ignored) {}
     }
 
     public boolean isAsc() {
