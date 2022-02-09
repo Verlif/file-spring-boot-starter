@@ -1,9 +1,9 @@
-package idea.verlif.file.service.impl;
+package idea.verlif.spring.file.impl;
 
-import idea.verlif.file.service.FileConfig;
-import idea.verlif.file.service.FileService;
-import idea.verlif.file.service.domain.*;
-import idea.verlif.file.service.util.File64Util;
+import idea.verlif.spring.file.FileConfig;
+import idea.verlif.spring.file.FileService;
+import idea.verlif.spring.file.util.File64Util;
+import idea.verlif.spring.file.domain.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;

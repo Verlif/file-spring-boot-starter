@@ -1,9 +1,9 @@
-package idea.verlif.file.service;
+package idea.verlif.spring.file;
 
-import idea.verlif.file.service.domain.FileCart;
-import idea.verlif.file.service.domain.FilePage;
-import idea.verlif.file.service.domain.FileQuery;
-import idea.verlif.file.service.domain.FileUpload;
+import idea.verlif.spring.file.domain.FileCart;
+import idea.verlif.spring.file.domain.FilePage;
+import idea.verlif.spring.file.domain.FileQuery;
+import idea.verlif.spring.file.domain.FileUpload;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;

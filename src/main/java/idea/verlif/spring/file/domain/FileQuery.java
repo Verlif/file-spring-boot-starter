@@ -1,4 +1,4 @@
-package idea.verlif.file.service.domain;
+package idea.verlif.spring.file.domain;
 
 import java.util.Locale;
 

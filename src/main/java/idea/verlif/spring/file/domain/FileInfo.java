@@ -1,4 +1,4 @@
-package idea.verlif.file.service.domain;
+package idea.verlif.spring.file.domain;
 
 import java.io.File;
 import java.util.Date;
@@ -46,7 +46,7 @@ public class FileInfo {
             this.suffix = name.substring(suf + 1);
         }
     }
-    
+
     public FileInfo(FileInfo info) {
         fill(info);
     }

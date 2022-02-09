@@ -1,4 +1,4 @@
-package idea.verlif.file.service.util;
+package idea.verlif.spring.file.util;
 
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;

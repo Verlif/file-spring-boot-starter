@@ -1,4 +1,4 @@
-package idea.verlif.file.service;
+package idea.verlif.spring.file;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
