@@ -1,5 +1,8 @@
 package idea.verlif.spring.file.domain;
 
+import idea.verlif.spring.file.FileConfig;
+import idea.verlif.spring.file.util.FilePathUtil;
+
 /**
  * 文件域 <br/>
  * 文件域的目的是方便维护，并且可以通过简单的修改来达到对文件的权限管控 <br/>
@@ -11,8 +14,6 @@ package idea.verlif.spring.file.domain;
  */
 public class FileCart {
 
-    private static final String SPLIT = "/";
-
     /**
      * 文件夹名
      */
@@ -20,12 +21,13 @@ public class FileCart {
 
     public FileCart(String type) {
         StringBuilder sb = new StringBuilder();
-        for (String s : type.split(SPLIT)) {
+        String split = type.contains("/") ? "/" : "\\\\";
+        for (String s : type.split(split)) {
             if (s.length() > 0) {
-                sb.append(s).append(SPLIT);
+                sb.append(s).append(FileConfig.DIR_SPLIT);
             }
         }
-        this.Area = sb.toString();
+        this.Area = FilePathUtil.beautyPath(sb.toString());
     }
 
     public String getArea() {

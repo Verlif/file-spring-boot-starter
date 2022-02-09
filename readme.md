@@ -28,9 +28,8 @@ public class FileServiceImpl extends DefaultFileService {
 
     @Override
     protected FileInfo buildInfo(File file) {
-        FileInfo info = super.buildInfo(file);
         // FileData为业务数据，继承了FileInfo
-        return new FileData(info);
+        return new FileData(file);
     }
 }
 ```
@@ -102,7 +101,7 @@ public class FileController {
 >        <dependency>
 >            <groupId>com.github.Verlif</groupId>
 >            <artifactId>file-spring-boot-starter</artifactId>
->            <version>2.6.3-0.1.2</version>
+>            <version>2.6.3-0.2</version>
 >        </dependency>
 >    </dependencies>
 > ```
