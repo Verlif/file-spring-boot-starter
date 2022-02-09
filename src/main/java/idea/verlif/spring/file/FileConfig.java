@@ -1,6 +1,7 @@
 package idea.verlif.spring.file;
 
 import idea.verlif.spring.file.impl.DefaultFileService;
+import idea.verlif.spring.file.util.FilePathUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -83,13 +84,14 @@ public class FileConfig {
         /**
          * 文件系统根路径
          */
-        private String main = "/upload/";
+        private String main = DIR_SPLIT + "upload" + DIR_SPLIT;
 
         public void setMain(String main) {
-            if (!main.endsWith(DIR_SPLIT)) {
-                this.main = main + DIR_SPLIT;
+            String path = FilePathUtil.beautyPath(main);
+            if (!path.endsWith(DIR_SPLIT)) {
+                this.main = path + DIR_SPLIT;
             } else {
-                this.main = main;
+                this.main = path;
             }
             LOGGER.info("File service's main path is based on " + this.main);
         }
