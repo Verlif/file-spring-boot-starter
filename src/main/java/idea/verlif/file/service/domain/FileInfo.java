@@ -32,7 +32,8 @@ public class FileInfo {
      */
     private String suffix;
 
-    public FileInfo() {}
+    public FileInfo() {
+    }
 
     public FileInfo(File file) {
         String name = file.getName();
@@ -44,6 +45,22 @@ public class FileInfo {
         if (suf != -1) {
             this.suffix = name.substring(suf + 1);
         }
+    }
+    
+    public FileInfo(FileInfo info) {
+        fill(info);
+    }
+
+    /**
+     * 填充文件信息
+     *
+     * @param info 文件信息
+     */
+    public void fill(FileInfo info) {
+        this.fileName = info.fileName;
+        this.updateTime = info.updateTime;
+        this.size = info.size;
+        this.suffix = info.suffix;
     }
 
     public String getFileName() {

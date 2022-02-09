@@ -86,6 +86,7 @@ public class FileConfig {
         private String main = "/upload/";
 
         public void setMain(String main) {
+            main = main.replaceAll("/", DIR_SPLIT).replaceAll("\\\\", DIR_SPLIT);
             if (!main.endsWith(DIR_SPLIT)) {
                 this.main = main + DIR_SPLIT;
             } else {

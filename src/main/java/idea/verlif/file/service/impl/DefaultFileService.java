@@ -85,7 +85,7 @@ public class DefaultFileService implements FileService {
                 if (files != null) {
                     // 遍历文件夹内的文件对象，载入列表
                     for (File f : files) {
-                        FileInfo info = buildInfo(f);
+                        FileInfo info = buildInfo(fileCart, type, f);
                         list.add(info);
                     }
                 }
@@ -151,9 +151,11 @@ public class DefaultFileService implements FileService {
      * 构建Info对象
      *
      * @param file 文件对象
+     * @param cart 文件域
+     * @param type 文件自目录；可为空
      * @return 文件对应的Info对象
      */
-    protected FileInfo buildInfo(File file) {
+    protected FileInfo buildInfo(FileCart cart, String type, File file) {
         return new FileInfo(file);
     }
 
