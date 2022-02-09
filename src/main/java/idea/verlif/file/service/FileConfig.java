@@ -86,11 +86,11 @@ public class FileConfig {
         private String main = "/upload/";
 
         public void setMain(String main) {
-            main = main.replaceAll("/", DIR_SPLIT).replaceAll("\\\\", DIR_SPLIT);
-            if (!main.endsWith(DIR_SPLIT)) {
-                this.main = main + DIR_SPLIT;
+            String path = main.replaceAll("/", DIR_SPLIT).replaceAll("\\\\", DIR_SPLIT);
+            if (!path.endsWith(DIR_SPLIT)) {
+                this.main = path + DIR_SPLIT;
             } else {
-                this.main = main;
+                this.main = path;
             }
             LOGGER.info("File service's main path is based on " + this.main);
         }
