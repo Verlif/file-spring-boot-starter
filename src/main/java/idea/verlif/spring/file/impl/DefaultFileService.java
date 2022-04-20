@@ -80,14 +80,12 @@ public class DefaultFileService implements FileService {
         // 获取文件夹对象
         File file = getLocalFile(fileCart, type);
         if (file.exists()) {
-            if (file.isDirectory()) {
-                File[] files = file.listFiles();
-                if (files != null) {
-                    // 遍历文件夹内的文件对象，载入列表
-                    for (File f : files) {
-                        FileInfo info = buildInfo(fileCart, type, f);
-                        list.add(info);
-                    }
+            File[] files = file.listFiles();
+            if (files != null) {
+                // 遍历文件夹内的文件对象，载入列表
+                for (File f : files) {
+                    FileInfo info = buildInfo(fileCart, type, f);
+                    list.add(info);
                 }
             }
         }

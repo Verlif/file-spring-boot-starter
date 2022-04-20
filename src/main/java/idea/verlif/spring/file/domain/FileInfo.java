@@ -32,6 +32,11 @@ public class FileInfo {
      */
     private String suffix;
 
+    /**
+     * 是否是文件
+     */
+    private boolean isFile;
+
     public FileInfo() {
     }
 
@@ -45,6 +50,8 @@ public class FileInfo {
         if (suf != -1) {
             this.suffix = name.substring(suf + 1);
         }
+
+        this.isFile = file.isFile();
     }
 
     public FileInfo(FileInfo info) {
@@ -95,6 +102,14 @@ public class FileInfo {
 
     public void setSuffix(String suffix) {
         this.suffix = suffix;
+    }
+
+    public boolean isFile() {
+        return isFile;
+    }
+
+    public void setFile(boolean file) {
+        isFile = file;
     }
 
     @Override
