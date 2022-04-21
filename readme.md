@@ -26,11 +26,20 @@ public class FileServiceImpl extends DefaultFileService {
         super(config);
     }
 
+    /**
+     * 重写buildInfo来提供自定义的更多的属性
+     * 
+     * @param file 文件对象
+     * @param cart 文件域
+     * @param type 文件自目录；可能为空
+     * @return 文件对应的Info对象
+     */
     @Override
-    protected FileInfo buildInfo(File file) {
-        // FileData为业务数据，继承了FileInfo
-        return new FileData(file);
+    protected FileInfo buildInfo(FileCart cart, String type, File file) {
+        return new FileInfoExt(file, cart.getArea() + type);
     }
+    
+    // 重写更多的方法来实现自己的逻辑
 }
 ```
 
@@ -101,7 +110,7 @@ public class FileController {
 >        <dependency>
 >            <groupId>com.github.Verlif</groupId>
 >            <artifactId>file-spring-boot-starter</artifactId>
->            <version>2.6.6-0.4</version>
+>            <version>2.6.6-0.5</version>
 >        </dependency>
 >    </dependencies>
 > ```
