@@ -37,10 +37,15 @@ public class FileInfo {
      */
     private boolean isFile;
 
+    /**
+     * 相对路径
+     */
+    private String path;
+
     public FileInfo() {
     }
 
-    public FileInfo(File file) {
+    public FileInfo(File file, String path) {
         String name = file.getName();
         this.fileName = name;
         this.updateTime = new Date(file.lastModified());
@@ -52,6 +57,7 @@ public class FileInfo {
         }
 
         this.isFile = file.isFile();
+        this.path = path;
     }
 
     public FileInfo(FileInfo info) {
@@ -68,6 +74,8 @@ public class FileInfo {
         this.updateTime = info.updateTime;
         this.size = info.size;
         this.suffix = info.suffix;
+        this.isFile = info.isFile;
+        this.path = info.path;
     }
 
     public String getFileName() {
@@ -110,6 +118,14 @@ public class FileInfo {
 
     public void setFile(boolean file) {
         isFile = file;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     @Override

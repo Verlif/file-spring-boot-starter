@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -92,8 +93,9 @@ public class DefaultFileService implements FileService {
         // 开始过滤操作
         List<FileInfo> filterList;
         if (query.getName() != null) {
+            Pattern pattern = Pattern.compile(query.getName());
             filterList = list.stream()
-                    .filter(fileInfo -> (fileInfo.getFileName().contains(query.getName())))
+                    .filter(fileInfo -> (pattern.matcher(fileInfo.getFileName()).find()))
                     .sorted((o1, o2) -> (int) (o2.getUpdateTime().getTime() - o1.getUpdateTime().getTime()))
                     .collect(Collectors.toList());
         } else {
@@ -154,7 +156,7 @@ public class DefaultFileService implements FileService {
      * @return 文件对应的Info对象
      */
     protected FileInfo buildInfo(FileCart cart, String type, File file) {
-        return new FileInfo(file);
+        return new FileInfo(file, cart.getArea() + type);
     }
 
     protected FilePage page(List<FileInfo> list, FileQuery query) {
