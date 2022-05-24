@@ -311,7 +311,7 @@ public class DefaultFileService implements FileService {
         if (filename != null) {
             file = new File(file, filename);
         }
-        if (file.exists() && file.isFile()) {
+        if (file.exists()) {
             return FileUtils.deleteFile(file) > 0;
         } else {
             return false;
