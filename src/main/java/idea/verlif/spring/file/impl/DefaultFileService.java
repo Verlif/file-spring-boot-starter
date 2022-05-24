@@ -2,8 +2,9 @@ package idea.verlif.spring.file.impl;
 
 import idea.verlif.spring.file.FileConfig;
 import idea.verlif.spring.file.FileService;
-import idea.verlif.spring.file.util.File64Util;
 import idea.verlif.spring.file.domain.*;
+import idea.verlif.spring.file.util.File64Util;
+import idea.verlif.spring.file.util.FileUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -301,34 +302,19 @@ public class DefaultFileService implements FileService {
      *
      * @param fileCart 目标文件所在文件域
      * @param type     文件子目录；可为空
-     * @param fileName 目标文件名
+     * @param filename 目标文件名
      * @return 删除结果
      */
     @Override
-    public boolean deleteFile(FileCart fileCart, String type, String fileName) {
-        File file = new File(getLocalFile(fileCart, type), fileName);
+    public boolean deleteFile(FileCart fileCart, String type, String filename) {
+        File file = getLocalFile(fileCart, type);
+        if (filename != null) {
+            file = new File(file, filename);
+        }
         if (file.exists() && file.isFile()) {
-            return file.delete();
+            return FileUtils.deleteFile(file) > 0;
         } else {
             return false;
-        }
-    }
-
-    /**
-     * 删除文件
-     *
-     * @param file 目标文件
-     */
-    protected void deleteFiles(File file) {
-        if (file.isFile()) {
-            file.delete();
-        } else {
-            File[] files = file.listFiles();
-            if (files != null) {
-                for (File f : files) {
-                    deleteFiles(f);
-                }
-            }
         }
     }
 

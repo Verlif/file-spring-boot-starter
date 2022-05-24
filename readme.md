@@ -110,7 +110,7 @@ public class FileController {
 >        <dependency>
 >            <groupId>com.github.Verlif</groupId>
 >            <artifactId>file-spring-boot-starter</artifactId>
->            <version>2.6.6-0.5</version>
+>            <version>2.6.6-0.6</version>
 >        </dependency>
 >    </dependencies>
 > ```

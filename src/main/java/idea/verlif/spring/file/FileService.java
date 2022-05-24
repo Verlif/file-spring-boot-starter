@@ -105,8 +105,8 @@ public interface FileService {
      *
      * @param fileCart 目标文件所在文件域
      * @param type     文件子目录；可为空
-     * @param fileName 目标文件名
+     * @param filename 目标文件名
      * @return 删除结果
      */
-    boolean deleteFile(FileCart fileCart, String type, String fileName);
+    boolean deleteFile(FileCart fileCart, String type, String filename);
 }
