@@ -2,9 +2,8 @@ package idea.verlif.spring.file.impl;
 
 import idea.verlif.spring.file.FileConfig;
 import idea.verlif.spring.file.FileService;
-import idea.verlif.spring.file.domain.*;
-import idea.verlif.spring.file.exception.DuplicateNameException;
 import idea.verlif.spring.file.util.File64Util;
+import idea.verlif.spring.file.domain.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -213,11 +212,19 @@ public class DefaultFileService implements FileService {
         if (file == null) {
             return false;
         }
-        File target = preBuildTarget(fileCart, type, filename);
-        if (target == null) {
+        File dirFile = getLocalFile(fileCart, type);
+        // 创建目标文件域
+        if (!dirFile.exists()) {
+            if (!dirFile.mkdirs()) {
+                return false;
+            }
+        }
+        File dir = new File(dirFile, filename);
+        // 当不允许覆盖且文件已存在时不保存
+        if (dir.exists() && pathConfig.isIgnored()) {
             return false;
         }
-        file.transferTo(target);
+        file.transferTo(dir);
         return true;
     }
 
@@ -226,28 +233,20 @@ public class DefaultFileService implements FileService {
         if (upload.getFile() == null) {
             return false;
         }
-        File target = preBuildTarget(fileCart, type, filename);
-        if (target == null) {
-            return false;
-        }
-        File64Util.toFile(upload.getFile(), target);
-        return true;
-    }
-
-    private File preBuildTarget(FileCart fileCart, String type, String filename) throws DuplicateNameException {
         File dirFile = getLocalFile(fileCart, type);
         // 创建目标文件域
         if (!dirFile.exists()) {
             if (!dirFile.mkdirs()) {
-                return null;
+                return false;
             }
         }
         File target = new File(dirFile, filename);
         // 当不允许覆盖且文件已存在时不保存
         if (target.exists() && pathConfig.isIgnored()) {
-            throw new DuplicateNameException(filename);
+            return false;
         }
-        return target;
+        File64Util.toFile(upload.getFile(), target);
+        return true;
     }
 
     /**
@@ -407,12 +406,11 @@ public class DefaultFileService implements FileService {
         deleteFiles(getBackFile(file));
     }
 
-    protected File getBackFile(String path) {
-        return new File(path, ".back");
+    protected File getBackFile(String dirPath) {
+        return new File(dirPath, ".back");
     }
 
-    protected File getBackFile(File file) {
-        return new File(file, ".back");
+    protected File getBackFile(File dirFile) {
+        return new File(dirFile, ".back");
     }
-
 }

@@ -19,12 +19,12 @@ public class FileQuery {
     /**
      * 每页大小
      */
-    protected Integer page = 15;
+    protected Integer size = 15;
 
     /**
      * 页码，从1开始
      */
-    protected Integer num = 1;
+    protected Integer current = 1;
 
     /**
      * 排序字段
@@ -44,32 +44,32 @@ public class FileQuery {
         this.name = name;
     }
 
-    public Integer getPage() {
-        return page;
+    public Integer getSize() {
+        return size;
     }
 
-    public void setPage(Integer page) {
-        if (page > 0) {
-            this.page = page;
+    public void setSize(Integer size) {
+        if (size > 0) {
+            this.size = size;
         }
     }
 
-    public Integer getNum() {
-        return num;
+    public Integer getCurrent() {
+        return current;
     }
 
     /**
      * 获取页头序号
      */
     public Integer getPageHead() {
-        return (num - 1) * page;
+        return (current - 1) * size;
     }
 
-    public void setNum(Integer num) {
-        if (num < 1) {
-            this.num = 1;
+    public void setCurrent(Integer current) {
+        if (current < 1) {
+            this.current = 1;
         } else {
-            this.num = num;
+            this.current = current;
         }
     }
 

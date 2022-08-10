@@ -32,10 +32,20 @@ public class FileInfo {
      */
     private String suffix;
 
+    /**
+     * 是否是文件
+     */
+    private boolean isFile;
+
+    /**
+     * 相对路径
+     */
+    private String path;
+
     public FileInfo() {
     }
 
-    public FileInfo(File file) {
+    public FileInfo(File file, String path) {
         String name = file.getName();
         this.fileName = name;
         this.updateTime = new Date(file.lastModified());
@@ -45,6 +55,9 @@ public class FileInfo {
         if (suf != -1) {
             this.suffix = name.substring(suf + 1);
         }
+
+        this.isFile = file.isFile();
+        this.path = path;
     }
 
     public FileInfo(FileInfo info) {
@@ -61,6 +74,8 @@ public class FileInfo {
         this.updateTime = info.updateTime;
         this.size = info.size;
         this.suffix = info.suffix;
+        this.isFile = info.isFile;
+        this.path = info.path;
     }
 
     public String getFileName() {
@@ -95,6 +110,22 @@ public class FileInfo {
 
     public void setSuffix(String suffix) {
         this.suffix = suffix;
+    }
+
+    public boolean isFile() {
+        return isFile;
+    }
+
+    public void setFile(boolean file) {
+        isFile = file;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     @Override
