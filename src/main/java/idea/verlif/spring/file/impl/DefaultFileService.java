@@ -156,22 +156,22 @@ public class DefaultFileService implements FileService {
      * @return 文件对应的Info对象
      */
     protected FileInfo buildInfo(FileCart cart, String type, File file) {
-        return new FileInfo(file);
+        return new FileInfo(file, cart.getArea() + type);
     }
 
     protected FilePage page(List<FileInfo> list, FileQuery query) {
         FilePage page = new FilePage();
         page.setTotal(list.size());
-        page.setSize(query.getPage());
+        page.setSize(query.getSize());
         page.setPages(page.getTotal() / page.getSize());
         if (page.getTotal() % page.getSize() > 0) {
             page.setPages(page.getPages() + 1);
         }
-        page.setCurrent(query.getNum());
+        page.setCurrent(query.getCurrent());
         if (query.getPageHead() > list.size()) {
             page.setInfos(new ArrayList<>());
         } else {
-            int end = query.getPageHead() + query.getPage();
+            int end = query.getPageHead() + query.getSize();
             page.setInfos(list.subList(query.getPageHead(), Math.min(end, list.size())));
         }
         return page;
