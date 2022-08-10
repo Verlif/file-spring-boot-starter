@@ -1,5 +1,10 @@
 package idea.verlif.spring.file.domain;
 
+import idea.verlif.spring.file.util.File64Util;
+
+import java.io.File;
+import java.io.IOException;
+
 /**
  * 文件上传信息
  *
@@ -35,4 +40,18 @@ public class FileUpload {
         this.file = file;
     }
 
+    public static FileUpload toUpload(String path) throws IOException {
+        return toUpload(new File(path));
+    }
+
+    public static FileUpload toUpload(File file) throws IOException {
+        if (file.exists() && file.isFile()) {
+            FileUpload upload = new FileUpload();
+            upload.setFile(File64Util.toBase64(file));
+            upload.setFilename(file.getName());
+            return upload;
+        } else {
+            return null;
+        }
+    }
 }

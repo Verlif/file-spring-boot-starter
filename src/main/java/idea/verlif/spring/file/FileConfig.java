@@ -30,7 +30,7 @@ public class FileConfig {
     /**
      * 是否允许覆盖同名文件
      */
-    private boolean cover;
+    private boolean cover = false;
 
     /**
      * 路径配置
@@ -79,7 +79,7 @@ public class FileConfig {
         return path;
     }
 
-    private static final class Path {
+    public static final class Path {
 
         /**
          * 文件系统根路径

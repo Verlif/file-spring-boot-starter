@@ -2,8 +2,9 @@ package idea.verlif.spring.file.impl;
 
 import idea.verlif.spring.file.FileConfig;
 import idea.verlif.spring.file.FileService;
-import idea.verlif.spring.file.util.File64Util;
 import idea.verlif.spring.file.domain.*;
+import idea.verlif.spring.file.exception.DuplicateNameException;
+import idea.verlif.spring.file.util.File64Util;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -212,19 +213,11 @@ public class DefaultFileService implements FileService {
         if (file == null) {
             return false;
         }
-        File dirFile = getLocalFile(fileCart, type);
-        // 创建目标文件域
-        if (!dirFile.exists()) {
-            if (!dirFile.mkdirs()) {
-                return false;
-            }
-        }
-        File dir = new File(dirFile, filename);
-        // 当不允许覆盖且文件已存在时不保存
-        if (dir.exists() && pathConfig.isIgnored()) {
+        File target = preBuildTarget(fileCart, type, filename);
+        if (target == null) {
             return false;
         }
-        file.transferTo(dir);
+        file.transferTo(target);
         return true;
     }
 
@@ -233,20 +226,28 @@ public class DefaultFileService implements FileService {
         if (upload.getFile() == null) {
             return false;
         }
+        File target = preBuildTarget(fileCart, type, filename);
+        if (target == null) {
+            return false;
+        }
+        File64Util.toFile(upload.getFile(), target);
+        return true;
+    }
+
+    private File preBuildTarget(FileCart fileCart, String type, String filename) throws DuplicateNameException {
         File dirFile = getLocalFile(fileCart, type);
         // 创建目标文件域
         if (!dirFile.exists()) {
             if (!dirFile.mkdirs()) {
-                return false;
+                return null;
             }
         }
         File target = new File(dirFile, filename);
         // 当不允许覆盖且文件已存在时不保存
         if (target.exists() && pathConfig.isIgnored()) {
-            return false;
+            throw new DuplicateNameException(filename);
         }
-        File64Util.toFile(upload.getFile(), target);
-        return true;
+        return target;
     }
 
     /**
@@ -306,11 +307,20 @@ public class DefaultFileService implements FileService {
      */
     @Override
     public boolean deleteFile(FileCart fileCart, String type, String fileName) {
-        File file = new File(getLocalFile(fileCart, type), fileName);
-        if (file.exists() && file.isFile()) {
-            return file.delete();
+        File file;
+        if (fileName == null) {
+            file = getLocalFile(fileCart, type);
         } else {
-            return false;
+            file = new File(getLocalFile(fileCart, type), fileName);
+        }
+        if (file.exists()) {
+            if (file.isFile()) {
+                return file.delete();
+            } else {
+                return deleteFiles(file);
+            }
+        } else {
+            return true;
         }
     }
 
@@ -319,16 +329,17 @@ public class DefaultFileService implements FileService {
      *
      * @param file 目标文件
      */
-    protected void deleteFiles(File file) {
-        if (file.isFile()) {
-            file.delete();
-        } else {
+    protected boolean deleteFiles(File file) {
+        if (file.exists()) {
             File[] files = file.listFiles();
             if (files != null) {
                 for (File f : files) {
                     deleteFiles(f);
                 }
             }
+            return file.delete();
+        } else {
+            return true;
         }
     }
 
@@ -388,11 +399,20 @@ public class DefaultFileService implements FileService {
         return false;
     }
 
-    protected File getBackFile(String dirPath) {
-        return new File(dirPath, ".back");
+    protected void deleteBackFile(String path) {
+        deleteFiles(getBackFile(path));
     }
 
-    protected File getBackFile(File dirFile) {
-        return new File(dirFile, ".back");
+    protected void deleteBackFile(File file) {
+        deleteFiles(getBackFile(file));
     }
+
+    protected File getBackFile(String path) {
+        return new File(path, ".back");
+    }
+
+    protected File getBackFile(File file) {
+        return new File(file, ".back");
+    }
+
 }
