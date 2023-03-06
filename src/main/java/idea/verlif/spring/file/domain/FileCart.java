@@ -1,6 +1,7 @@
 package idea.verlif.spring.file.domain;
 
 import idea.verlif.spring.file.FileConfig;
+import idea.verlif.spring.file.FileDomain;
 import idea.verlif.spring.file.util.FilePathUtil;
 
 /**
@@ -10,14 +11,13 @@ import idea.verlif.spring.file.util.FilePathUtil;
  *
  * @author Verlif
  * @version 1.0
- * @date 2021/11/9 10:44
  */
-public class FileCart {
+public class FileCart implements FileDomain {
 
     /**
-     * 文件夹名
+     * 文件地址
      */
-    private final String Area;
+    private final String path;
 
     public FileCart(String type) {
         StringBuilder sb = new StringBuilder();
@@ -27,10 +27,11 @@ public class FileCart {
                 sb.append(s).append(FileConfig.DIR_SPLIT);
             }
         }
-        this.Area = FilePathUtil.beautyPath(sb.toString());
+        this.path = FilePathUtil.beautyPath(sb.toString());
     }
 
-    public String getArea() {
-        return Area;
+    @Override
+    public String getPath() {
+        return path;
     }
 }

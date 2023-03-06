@@ -1,6 +1,6 @@
 package idea.verlif.spring.file.domain;
 
-import idea.verlif.spring.file.util.File64Util;
+import idea.verlif.easy.file.util.File64Util;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,6 @@ import java.io.IOException;
  *
  * @author Verlif
  * @version 1.0
- * @date 2021/11/11 16:44
  */
 public class FileUpload {
 

@@ -63,19 +63,19 @@
                 @RequestParam String fileName,
                 HttpServletResponse response
         ) {
-            return fileService.downloadFile(response, new FileCart("test"), SecurityUtils.getUsername(), fileName);
+            return fileService.downloadFile(response, new FileCart("test"), fileName);
         }
     
         @GetMapping("/list")
         @Operation(summary = "文件列表")
-        public FilePage getFileList(FileQuery fileQuery) {
-            return fileService.getFileList(new FileCart("test"), SecurityUtils.getUsername(), fileQuery);
+        public FileInfoPage getFileList(FileQuery fileQuery) {
+            return fileService.getFileList(new FileCart("test"), fileQuery);
         }
     
         @DeleteMapping
         @Operation(summary = "删除文件")
         public boolean deleteFile(@RequestParam String filename) {
-            return fileService.deleteFile(new FileCart("test"), SecurityUtils.getUsername(), filename);
+            return fileService.deleteFile(new FileCart("test"), filename);
         }
     }
     ```
@@ -100,14 +100,16 @@
     maven
 
     ```xml
-       <dependencies>
-           <dependency>
-               <groupId>com.github.Verlif</groupId>
-               <artifactId>file-spring-boot-starter</artifactId>
-               <version>2.6.6-0.1</version>
-           </dependency>
-       </dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>com.github.Verlif</groupId>
+            <artifactId>file-spring-boot-starter</artifactId>
+            <version>2.6.14-0.1</version>
+        </dependency>
+    </dependencies>
     ```
+
+   __lastVersion__ [![](https://jitpack.io/v/Verlif/file-spring-boot-starter.svg)](https://jitpack.io/#Verlif/file-spring-boot-starter)
 
 ## 配置文件
 
@@ -125,5 +127,4 @@ station:
 
 ## 说明
 
-* `FileCart`表示了文件域，也就是文件夹。**不**允许为空。
-* `type`表示了文件域下的子文件夹。与`FileCart`分开的目的是为了做类型区分。允许为空。
+* `FileDomain`表示了文件域，也就是文件夹。**不**允许为空。

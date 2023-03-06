@@ -8,7 +8,6 @@ import java.util.Date;
  *
  * @author Verlif
  * @version 1.0
- * @date 2021/9/13 10:22
  */
 public class FileInfo {
 
@@ -42,9 +41,6 @@ public class FileInfo {
      */
     private String path;
 
-    public FileInfo() {
-    }
-
     public FileInfo(File file, String path) {
         String name = file.getName();
         this.fileName = name;
@@ -60,8 +56,8 @@ public class FileInfo {
         this.path = path;
     }
 
-    public FileInfo(FileInfo info) {
-        fill(info);
+    public FileInfo(File file) {
+        this(file, file.getPath());
     }
 
     /**
@@ -128,13 +124,4 @@ public class FileInfo {
         this.path = path;
     }
 
-    @Override
-    public String toString() {
-        return "FileInfo{" +
-                "fileName='" + fileName + '\'' +
-                ", updateTime=" + updateTime +
-                ", size=" + size +
-                ", suffix='" + suffix + '\'' +
-                '}';
-    }
 }

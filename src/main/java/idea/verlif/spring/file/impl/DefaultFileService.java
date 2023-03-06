@@ -1,9 +1,15 @@
 package idea.verlif.spring.file.impl;
 
+import idea.verlif.easy.file.domain.FileHolder;
+import idea.verlif.easy.file.page.FilePage;
+import idea.verlif.easy.file.page.FileQuery;
+import idea.verlif.easy.file.util.File64Util;
 import idea.verlif.spring.file.FileConfig;
+import idea.verlif.spring.file.FileDomain;
 import idea.verlif.spring.file.FileService;
-import idea.verlif.spring.file.util.File64Util;
-import idea.verlif.spring.file.domain.*;
+import idea.verlif.spring.file.domain.FileInfo;
+import idea.verlif.spring.file.domain.FileInfoPage;
+import idea.verlif.spring.file.domain.FileUpload;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -11,15 +17,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Verlif
  * @version 1.0
- * @date 2021/9/13 10:27
  */
 public class DefaultFileService implements FileService {
 
@@ -32,119 +33,56 @@ public class DefaultFileService implements FileService {
     /**
      * 获取本地文件夹地址
      *
-     * @param fileCart 文件域
-     * @param type     文件子目录；可为空
+     * @param fileDomain 文件域
      * @return 本地文件地址
      */
     @Override
-    public File getLocalFile(FileCart fileCart, String type) {
-        String path = fileCart.getArea();
+    public File getLocalFile(FileDomain fileDomain) {
+        String path = fileDomain.getPath();
         if (!path.endsWith(FileConfig.DIR_SPLIT)) {
             path = path + FileConfig.DIR_SPLIT;
         }
-        return new File(pathConfig.getMain() + path + (type == null ? "" : type));
+        return new File(pathConfig.getMain() + path);
     }
 
     /**
      * 获取外网可访问的文件地址
      *
-     * @param fileCart 文件域
-     * @param type     文件子路径；可为空
-     * @param fileName 文件名
+     * @param fileDomain 文件域
+     * @param fileName   文件名
      * @return 文件地址
      */
     @Override
-    public String getRealPath(FileCart fileCart, String type, String fileName) {
-        String path = fileCart.getArea();
+    public String getRealPath(FileDomain fileDomain, String fileName) {
+        String path = fileDomain.getPath();
         if (!path.endsWith(FileConfig.DIR_SPLIT)) {
             path += FileConfig.DIR_SPLIT;
         }
-        return pathConfig.getMain() + path + (type == null ? "" : type) + FileConfig.DIR_SPLIT + fileName;
+        return pathConfig.getMain() + path + fileName;
     }
 
     /**
      * 获取文件列表
      *
-     * @param query    文件查询条件
-     * @param fileCart 文件域
-     * @param type     文件自目录；可为空
+     * @param query      文件查询条件
+     * @param fileDomain 文件域
      * @return 文件列表信息
      */
     @Override
-    public FilePage getFileList(FileCart fileCart, String type, FileQuery query) {
-        return getInfoList(fileCart, type, query);
+    public FileInfoPage getFileList(FileDomain fileDomain, FileQuery query) {
+        return getInfoList(fileDomain, query);
     }
 
-    protected FilePage getInfoList(FileCart fileCart, String type, FileQuery query) {
-        List<FileInfo> list = new ArrayList<>();
+    protected FileInfoPage getInfoList(FileDomain fileDomain, FileQuery query) {
         // 获取文件夹对象
-        File file = getLocalFile(fileCart, type);
-        if (file.exists()) {
-            if (file.isDirectory()) {
-                File[] files = file.listFiles();
-                if (files != null) {
-                    // 遍历文件夹内的文件对象，载入列表
-                    for (File f : files) {
-                        FileInfo info = buildInfo(fileCart, type, f);
-                        list.add(info);
-                    }
-                }
-            }
+        File file = getLocalFile(fileDomain);
+        FileHolder holder = new FileHolder(file);
+        // 对不存在的目录进行处理
+        FilePage filePage = holder.queryPage(query);
+        if (filePage.getFiles() == null) {
+            filePage.setFiles(new File[0]);
         }
-        // 开始过滤操作
-        List<FileInfo> filterList;
-        if (query.getName() != null) {
-            filterList = list.stream()
-                    .filter(fileInfo -> (fileInfo.getFileName().contains(query.getName())))
-                    .sorted((o1, o2) -> (int) (o2.getUpdateTime().getTime() - o1.getUpdateTime().getTime()))
-                    .collect(Collectors.toList());
-        } else {
-            filterList = list.stream()
-                    .sorted((o1, o2) -> (int) (o2.getUpdateTime().getTime() - o1.getUpdateTime().getTime()))
-                    .collect(Collectors.toList());
-        }
-        // 排序操作
-        if (query.getOrder() != null) {
-            Stream<FileInfo> stream = filterList.stream();
-            switch (query.getOrder()) {
-                case NAME:
-                    filterList = stream.sorted((o1, o2) -> query.isAsc() ?
-                                    o1.getFileName().compareTo(o2.getFileName()) :
-                                    o2.getFileName().compareTo(o1.getFileName()))
-                            .collect(Collectors.toList());
-                    break;
-                case SIZE:
-                    filterList = stream.sorted((o1, o2) -> (int) (query.isAsc() ?
-                                    o1.getSize() - o2.getSize() :
-                                    o2.getSize() - o1.getSize()))
-                            .collect(Collectors.toList());
-                    break;
-                case SUFFIX:
-                    filterList = stream.sorted((o1, o2) -> {
-                        if (o1.getSuffix() == null) {
-                            return -1;
-                        }
-                        if (o2.getSuffix() == null) {
-                            return 1;
-                        }
-                        return query.isAsc() ?
-                                o1.getSuffix().compareTo(o2.getSuffix()) :
-                                o2.getSuffix().compareTo(o1.getSuffix());
-                    }).collect(Collectors.toList());
-                    break;
-                case UPDATE_TIME:
-                    filterList = stream.sorted((o1, o2) -> (int) (query.isAsc() ?
-                                    o1.getUpdateTime().getTime() - o2.getUpdateTime().getTime() :
-                                    o2.getUpdateTime().getTime() - o1.getUpdateTime().getTime()))
-                            .collect(Collectors.toList());
-                    break;
-                default:
-            }
-        }
-        list.clear();
-        list.addAll(filterList);
-        // 创建分页对象
-        return page(list, query);
+        return new FileInfoPage(filePage, pathConfig.getMain());
     }
 
     /**
@@ -152,37 +90,18 @@ public class DefaultFileService implements FileService {
      *
      * @param file 文件对象
      * @param cart 文件域
-     * @param type 文件自目录；可为空
      * @return 文件对应的Info对象
      */
-    protected FileInfo buildInfo(FileCart cart, String type, File file) {
-        return new FileInfo(file, cart.getArea() + type);
-    }
-
-    protected FilePage page(List<FileInfo> list, FileQuery query) {
-        FilePage page = new FilePage();
-        page.setTotal(list.size());
-        page.setSize(query.getSize());
-        page.setPages(page.getTotal() / page.getSize());
-        if (page.getTotal() % page.getSize() > 0) {
-            page.setPages(page.getPages() + 1);
-        }
-        page.setCurrent(query.getCurrent());
-        if (query.getPageHead() > list.size()) {
-            page.setInfos(new ArrayList<>());
-        } else {
-            int end = query.getPageHead() + query.getSize();
-            page.setInfos(list.subList(query.getPageHead(), Math.min(end, list.size())));
-        }
-        return page;
+    protected FileInfo buildInfo(FileDomain cart, File file) {
+        return new FileInfo(file, cart.getPath());
     }
 
     @Override
-    public int uploadFile(FileCart fileCart, String type, MultipartFile... files) throws IOException {
+    public int uploadFile(FileDomain fileDomain, MultipartFile... files) throws IOException {
         if (files == null || files.length == 0) {
             return 0;
         }
-        File dirFile = getLocalFile(fileCart, type);
+        File dirFile = getLocalFile(fileDomain);
         // 创建目标文件域
         if (!dirFile.exists()) {
             if (!dirFile.mkdirs()) {
@@ -208,20 +127,12 @@ public class DefaultFileService implements FileService {
     }
 
     @Override
-    public boolean uploadFile(FileCart fileCart, String type, MultipartFile file, String filename) throws IOException {
+    public boolean uploadFile(FileDomain fileDomain, MultipartFile file, String filename) throws IOException {
         if (file == null) {
             return false;
         }
-        File dirFile = getLocalFile(fileCart, type);
-        // 创建目标文件域
-        if (!dirFile.exists()) {
-            if (!dirFile.mkdirs()) {
-                return false;
-            }
-        }
-        File dir = new File(dirFile, filename);
-        // 当不允许覆盖且文件已存在时不保存
-        if (dir.exists() && pathConfig.isIgnored()) {
+        File dir = createFile(fileDomain, filename);
+        if (dir == null) {
             return false;
         }
         file.transferTo(dir);
@@ -229,40 +140,47 @@ public class DefaultFileService implements FileService {
     }
 
     @Override
-    public boolean uploadFile(FileCart fileCart, String type, FileUpload upload, String filename) throws IOException {
+    public boolean uploadFile(FileDomain fileDomain, FileUpload upload, String filename) throws IOException {
         if (upload.getFile() == null) {
             return false;
         }
-        File dirFile = getLocalFile(fileCart, type);
-        // 创建目标文件域
-        if (!dirFile.exists()) {
-            if (!dirFile.mkdirs()) {
-                return false;
-            }
-        }
-        File target = new File(dirFile, filename);
-        // 当不允许覆盖且文件已存在时不保存
-        if (target.exists() && pathConfig.isIgnored()) {
+        File target = createFile(fileDomain, filename);
+        if (target == null) {
             return false;
         }
         File64Util.toFile(upload.getFile(), target);
         return true;
     }
 
+    private File createFile(FileDomain fileDomain, String filename) {
+        File dirFile = getLocalFile(fileDomain);
+        // 创建目标文件域
+        if (!dirFile.exists()) {
+            if (!dirFile.mkdirs()) {
+                return null;
+            }
+        }
+        File target = new File(dirFile, filename);
+        // 当不允许覆盖且文件已存在时不保存
+        if (target.exists() && pathConfig.isIgnored()) {
+            return null;
+        }
+        return target;
+    }
+
     /**
      * 下载文件
      *
-     * @param response 服务器响应对象
-     * @param fileCart 目标文件所在文件域
-     * @param type     文件子目录；可为空
-     * @param filename 目标文件名
+     * @param response   服务器响应对象
+     * @param fileDomain 目标文件所在文件域
+     * @param filename   目标文件名
      * @return 下载结果
      */
     @Override
-    public boolean downloadFile(HttpServletResponse response, FileCart fileCart, String type, String filename) throws IOException {
+    public boolean downloadFile(HttpServletResponse response, FileDomain fileDomain, String filename) throws IOException {
         response.setCharacterEncoding("UTF-8");
         response.setHeader("content-disposition", "attachment; fileName=" + filename);
-        File file = new File(getLocalFile(fileCart, type), filename);
+        File file = new File(getLocalFile(fileDomain), filename);
         if (file.exists()) {
             try (
                     FileInputStream fis = new FileInputStream(file);
@@ -281,36 +199,20 @@ public class DefaultFileService implements FileService {
         }
     }
 
-    @Override
-    public String buildFile64(FileCart fileCart, String type, String filename) throws IOException {
-        File dirFile = getLocalFile(fileCart, type);
-        // 判定文件域是否存在
-        if (!dirFile.exists()) {
-            return null;
-        }
-        File target = new File(dirFile, filename);
-        if (target.exists()) {
-            return File64Util.toBase64(target);
-        } else {
-            return null;
-        }
-    }
-
     /**
      * 删除文件
      *
-     * @param fileCart 目标文件所在文件域
-     * @param type     文件子目录；可为空
-     * @param fileName 目标文件名
+     * @param fileDomain 目标文件所在文件域
+     * @param fileName   目标文件名
      * @return 删除结果
      */
     @Override
-    public boolean deleteFile(FileCart fileCart, String type, String fileName) {
+    public boolean deleteFile(FileDomain fileDomain, String fileName) {
         File file;
         if (fileName == null) {
-            file = getLocalFile(fileCart, type);
+            file = getLocalFile(fileDomain);
         } else {
-            file = new File(getLocalFile(fileCart, type), fileName);
+            file = new File(getLocalFile(fileDomain), fileName);
         }
         if (file.exists()) {
             if (file.isFile()) {
