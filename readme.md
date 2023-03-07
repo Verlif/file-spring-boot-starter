@@ -4,6 +4,7 @@
 通过`FileService`来使用以下功能：
 
 * 文件上传（字节流与Base64）
+* 上传文件后缀限制（allowed名单与blocked名单）
 * 文件下载（字节流与Base64）
 * 文件查询（分页、排序、文件名过滤等）
 * 文件删除
@@ -14,31 +15,7 @@
 
     在任意配置类上使用`@EnableFileService`注解启用文件管理服务
 
-2. 拓展使用
-
-    默认的服务只包括简单的功能，没有包括诸如在线预览url、文件版本管理、备份策略等功能。  
-    开发者可以通过自行实现或是继承`DefaultFileService`来进行拓展修改：
-    
-    ```java
-    @Component
-    public class FileServiceImpl extends DefaultFileService {
-    
-        public FileServiceImpl(@Autowired FileConfig config) {
-            super(config);
-        }
-    
-        @Override
-        protected FileInfo buildInfo(File file) {
-            // FileData为业务数据，继承了FileInfo
-            return new FileData(file);
-        }
-    }
-    ```
-    
-    注意，因为`DefaultFileService`实现了`FileService`接口，所以实际上，开发者需要实现的是`FileService`接口。推荐通过继承重写的方式来实现需要的功能。  
-    可以通过自动注入来使用`FileConfig`配置
-
-3. 使用`FileService`
+2. 使用`FileService`
 
     在上传、下载文件时，可以使用`FileService`来完成。
     
@@ -123,6 +100,8 @@ station:
     path:
       # 文件系统根目录，相对路径或绝对路径
       main: F:/upload
+    allowed: jpg, png # 允许上传的文件后置，存在值时只允许设定值上传。忽略大小写。
+    blocked: exe # 不允许上传的文件后缀，blocked优先级大于allowed
 ```
 
 ## 说明

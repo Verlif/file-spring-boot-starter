@@ -1,19 +1,13 @@
 package idea.verlif.spring.file.exception;
 
-import java.io.IOException;
-
 /**
  * @author Verlif
  */
-public class DuplicateNameException extends IOException {
+public class DuplicateNameException extends RuntimeException {
 
-    private final String filename;
 
     public DuplicateNameException(String filename) {
-        this.filename = filename;
+        super(filename);
     }
 
-    public String getFilename() {
-        return filename;
-    }
 }

@@ -19,4 +19,9 @@ public class FilePathUtil {
             return path.replaceAll("/", "\\\\");
         }
     }
+
+    public static String filterPath(String path) {
+        return path.replace("..", "");
+    }
+
 }

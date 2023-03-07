@@ -10,6 +10,8 @@ import idea.verlif.spring.file.FileService;
 import idea.verlif.spring.file.domain.FileInfo;
 import idea.verlif.spring.file.domain.FileInfoPage;
 import idea.verlif.spring.file.domain.FileUpload;
+import idea.verlif.spring.file.exception.DuplicateNameException;
+import idea.verlif.spring.file.util.FilePathUtil;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +19,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Verlif
@@ -24,10 +29,10 @@ import java.io.OutputStream;
  */
 public class DefaultFileService implements FileService {
 
-    protected final FileConfig pathConfig;
+    protected final FileConfig fileConfig;
 
     public DefaultFileService(FileConfig config) {
-        this.pathConfig = config;
+        this.fileConfig = config;
     }
 
     /**
@@ -42,7 +47,7 @@ public class DefaultFileService implements FileService {
         if (!path.endsWith(FileConfig.DIR_SPLIT)) {
             path = path + FileConfig.DIR_SPLIT;
         }
-        return new File(pathConfig.getMain() + path);
+        return new File(fileConfig.getMain() + path);
     }
 
     /**
@@ -58,7 +63,7 @@ public class DefaultFileService implements FileService {
         if (!path.endsWith(FileConfig.DIR_SPLIT)) {
             path += FileConfig.DIR_SPLIT;
         }
-        return pathConfig.getMain() + path + fileName;
+        return fileConfig.getMain() + path + FilePathUtil.filterPath(fileName);
     }
 
     /**
@@ -82,7 +87,7 @@ public class DefaultFileService implements FileService {
         if (filePage.getFiles() == null) {
             filePage.setFiles(new File[0]);
         }
-        return new FileInfoPage(filePage, pathConfig.getMain());
+        return new FileInfoPage(filePage, fileConfig.getMain());
     }
 
     /**
@@ -97,38 +102,48 @@ public class DefaultFileService implements FileService {
     }
 
     @Override
-    public int uploadFile(FileDomain fileDomain, MultipartFile... files) throws IOException {
+    public MultipartFile[] uploadFile(FileDomain fileDomain, MultipartFile... files) throws IOException {
         if (files == null || files.length == 0) {
-            return 0;
+            return files;
+        }
+        List<MultipartFile> fails = new ArrayList<>();
+        // 检测是否允许上传
+        for (MultipartFile file : files) {
+            if (!fileConfig.isAllowed(Objects.requireNonNull(file.getOriginalFilename()))) {
+                return files;
+            }
         }
         File dirFile = getLocalFile(fileDomain);
         // 创建目标文件域
         if (!dirFile.exists()) {
             if (!dirFile.mkdirs()) {
-                return 0;
+                return files;
             }
         }
-        int count = 0;
         for (MultipartFile file : files) {
             String name = file.getOriginalFilename();
             // 没有文件时跳过
             if (name == null) {
+                fails.add(file);
                 continue;
             }
             File dir = new File(dirFile, name);
             // 当不允许覆盖且文件已存在时跳过
-            if (dir.exists() && pathConfig.isIgnored()) {
+            if (dir.exists() && fileConfig.isIgnored()) {
+                fails.add(file);
                 continue;
             }
             file.transferTo(dir);
-            count++;
         }
-        return count;
+        return fails.toArray(new MultipartFile[0]);
     }
 
     @Override
     public boolean uploadFile(FileDomain fileDomain, MultipartFile file, String filename) throws IOException {
         if (file == null) {
+            return false;
+        }
+        if (!fileConfig.isAllowed(filename)) {
             return false;
         }
         File dir = createFile(fileDomain, filename);
@@ -142,6 +157,9 @@ public class DefaultFileService implements FileService {
     @Override
     public boolean uploadFile(FileDomain fileDomain, FileUpload upload, String filename) throws IOException {
         if (upload.getFile() == null) {
+            return false;
+        }
+        if (!fileConfig.isAllowed(filename)) {
             return false;
         }
         File target = createFile(fileDomain, filename);
@@ -160,10 +178,10 @@ public class DefaultFileService implements FileService {
                 return null;
             }
         }
-        File target = new File(dirFile, filename);
+        File target = new File(dirFile, FilePathUtil.filterPath(filename));
         // 当不允许覆盖且文件已存在时不保存
-        if (target.exists() && pathConfig.isIgnored()) {
-            return null;
+        if (target.exists() && fileConfig.isIgnored()) {
+            throw new DuplicateNameException(filename);
         }
         return target;
     }
@@ -180,7 +198,7 @@ public class DefaultFileService implements FileService {
     public boolean downloadFile(HttpServletResponse response, FileDomain fileDomain, String filename) throws IOException {
         response.setCharacterEncoding("UTF-8");
         response.setHeader("content-disposition", "attachment; fileName=" + filename);
-        File file = new File(getLocalFile(fileDomain), filename);
+        File file = new File(getLocalFile(fileDomain), FilePathUtil.filterPath(filename));
         if (file.exists()) {
             try (
                     FileInputStream fis = new FileInputStream(file);
@@ -203,16 +221,16 @@ public class DefaultFileService implements FileService {
      * 删除文件
      *
      * @param fileDomain 目标文件所在文件域
-     * @param fileName   目标文件名
+     * @param filename   目标文件名
      * @return 删除结果
      */
     @Override
-    public boolean deleteFile(FileDomain fileDomain, String fileName) {
+    public boolean deleteFile(FileDomain fileDomain, String filename) {
         File file;
-        if (fileName == null) {
+        if (filename == null) {
             file = getLocalFile(fileDomain);
         } else {
-            file = new File(getLocalFile(fileDomain), fileName);
+            file = new File(getLocalFile(fileDomain), FilePathUtil.filterPath(filename));
         }
         if (file.exists()) {
             if (file.isFile()) {

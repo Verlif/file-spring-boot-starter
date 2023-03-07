@@ -1,7 +1,7 @@
 package idea.verlif.spring.file;
 
-import idea.verlif.spring.file.domain.FileInfoPage;
 import idea.verlif.easy.file.page.FileQuery;
+import idea.verlif.spring.file.domain.FileInfoPage;
 import idea.verlif.spring.file.domain.FileUpload;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,9 +48,9 @@ public interface FileService {
      *
      * @param fileDomain 文件域
      * @param files      目标文件组
-     * @return 上传成功的文件数量
+     * @return 上传失败的文件列表。当有一个文件被限制上传时，所有文件都无法上传。
      */
-    int uploadFile(FileDomain fileDomain, MultipartFile... files) throws IOException;
+    MultipartFile[] uploadFile(FileDomain fileDomain, MultipartFile... files) throws IOException;
 
     /**
      * 上传文件

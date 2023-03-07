@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Verlif
@@ -37,8 +39,24 @@ public class FileConfig {
      */
     private Path path;
 
+    /**
+     * 允许的后缀
+     */
+    private String allowed;
+
+    private final Set<String> allowedSet;
+
+    /**
+     * 不允许的后缀
+     */
+    private String blocked;
+
+    private final Set<String> blockedSet;
+
     public FileConfig() {
         path = new Path();
+        allowedSet = new HashSet<>();
+        blockedSet = new HashSet<>();
     }
 
     /**
@@ -77,6 +95,36 @@ public class FileConfig {
 
     public Path getPath() {
         return path;
+    }
+
+    public String getAllowed() {
+        return allowed;
+    }
+
+    public void setAllowed(String allowed) {
+        this.allowed = allowed;
+        for (String s : allowed.split(",")) {
+            allowedSet.add(s.trim().toUpperCase());
+        }
+    }
+
+    public String getBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(String blocked) {
+        this.blocked = blocked;
+        for (String s : blocked.split(",")) {
+            blockedSet.add(s.trim().toUpperCase());
+        }
+    }
+
+    public boolean isAllowed(String filename) {
+        String suffix = filename.substring(filename.lastIndexOf('.') + 1).toUpperCase();
+        if (blockedSet.size() > 0 && blockedSet.contains(suffix)) {
+            return false;
+        }
+        return allowedSet.size() == 0 || allowedSet.contains(suffix);
     }
 
     public static final class Path {
